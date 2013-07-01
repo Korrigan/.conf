@@ -1,0 +1,14 @@
+[color]
+	diff	= auto
+	branch	= auto
+	status	= auto
+
+[user]
+	name	= Korrigan
+	email	= korrigan@epitech.eu
+
+[alias]
+	ci	= commit -am
+	st 	= status
+	co	= checkout
+	br	= branch
