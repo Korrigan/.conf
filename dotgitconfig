@@ -4,11 +4,11 @@
 	status	= auto
 
 [user]
-	name	= Korrigan
-	email	= korrigan@epitech.eu
+	name	= Matthieu Rosinski
+	email	= korrigan@staff.42.fr
 
 [alias]
-	ci	= commit -am
+	ci	= commit -m
 	st 	= status
 	co	= checkout
 	br	= branch
