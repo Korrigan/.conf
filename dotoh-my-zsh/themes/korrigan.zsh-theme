@@ -9,12 +9,12 @@ _fishy_collapsed_wd() {
 ")
 } 
 
-local user_color='green'; [ $UID -eq 0 ] && user_color='red'
-PROMPT='%{$fg_bold[blue]%}%n%{$reset_color%}%{$fg[cyan]%}@%{$fg_bold[blue]%}%m%{$reset_color%} %{$fg[$user_color]%}$(_fishy_collapsed_wd)%{$reset_color%}%(!.#.>) '
+local user_color='cyan'; [ $UID -eq 0 ] && user_color='red'
+PROMPT='- %{$fg[$user_color]%}%n%{$reset_color%}@%{$fg[$user_color]%}%m%{$reset_color%} %(!.#.>) '
 PROMPT2='%{$fg[red]%}\ %{$reset_color%}'
 
-local return_status="%{$fg_bold[red]%}%(?..%?)%{$reset_color%}"
-RPROMPT='${return_status}$(git_prompt_info)$(git_prompt_status)%{$reset_color%}'
+local return_status="%{$fg_bold[red]%}%(?..%?)%{$reset_color%} "
+RPROMPT='${return_status}%{$fg[$user_color]%}$(_fishy_collapsed_wd)%{$reset_color%}$(git_prompt_info)$(git_prompt_status)%{$reset_color%}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX=" "
 ZSH_THEME_GIT_PROMPT_SUFFIX=""
