@@ -54,6 +54,7 @@ alias gogol='ssh root@10.42.1.253 -i ~/.ssh/42_rsa afplay /Users/bocal/gogol.mp3
 # My env
 export EDITOR=emacs
 export PAGER=most
+export PATH=/usr/local/bin:${PATH}:/usr/texbin
 
 if [ -f ~/.rvm/scripts/rvm ]; then
   source ~/.rvm/scripts/rvm
