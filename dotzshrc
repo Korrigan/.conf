@@ -49,7 +49,7 @@ export EDITOR=emacs
 export PAGER=most
 export VENV_PATH=~/venv/
 export VIRTUAL_ENV_DISABLE_PROMPT=""
-export PATH=${PATH}:/usr/local/bin
+export PATH=/usr/local/bin:${PATH}:/usr/texbin
 
 if [ -f ~/.rvm/scripts/rvm ]; then
   source ~/.rvm/scripts/rvm
