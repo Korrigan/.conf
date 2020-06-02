@@ -36,25 +36,38 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git pip virtualenv brew python django)
+plugins=(git pip virtualenv brew)
 
 source $ZSH/oh-my-zsh.sh
 
 # My aliases
 alias clean='find . -name "*~" -exec rm -vf \{\} \;'
 alias l='ls -lh'
+alias fuck='sudo $(fc -nl -1)'
+alias reload='source ~/.zshrc'
+alias lorem='echo "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?" | pbcopy'
 
 # My env
-export EDITOR=emacs
+export EDITOR="code --wait"
 export PAGER=most
 export VENV_PATH=~/venv/
 export VIRTUAL_ENV_DISABLE_PROMPT=""
-export PATH=/usr/local/bin:${PATH}:/usr/texbin
+#export PATH=/usr/local/bin:/usr/local/sbin:${PATH}:/usr/texbin:/Users/korrigan/dev/depot_tools
+export PATH=${PATH}:$HOME/.rvm/bin:/usr/local/bin:/usr/local/sbin:/usr/texbin:/usr/local/opt/openssl@1.1/bin:/Users/korrigan/Library/Python/2.7/bin
+export LC_ALL="en_US.utf-8"
+export LANG="en_US.utf-8"
 
-if [ -f ~/.rvm/scripts/rvm ]; then
-  source ~/.rvm/scripts/rvm
-  PATH=$PATH:$HOME/.rvm/bin
-fi
+# Password generator
+function pwgen() {
+  local len
+
+  len=8
+  if [ ! -z $1 ]; then
+      len=$1
+  fi
+  local password=`</dev/urandom tr -dc '[:alnum:]' | head -c $len`
+  echo $password
+}
 
 # Load virtualenv
 function venv() {
@@ -65,12 +78,93 @@ function venv() {
     v=${VENV_PATH}/$1
     if [ -d $v ]; then
 	source $v/bin/activate
+	export PATH=$v/bin:${PATH}
     else
 	echo "No such virtualenv: $1"
     fi
+}
+
+# Aws stuff
+alias qssh="~/dev/quanta/infra/symphony/qssh"
+alias qstage="~/dev/quanta/infra/symphony/qssh qm3k-staging"
+alias qprod="~/dev/quanta/infra/symphony/qssh qm3k-prod"
+alias qcore="~/dev/quanta/infra/symphony/qssh quanta-core"
+alias maestro="BUNDLE_GEMFILE=~/dev/quanta/infra/Gemfile ~/dev/quanta/infra/symphony/maestro"
+alias athena="~/dev/quanta/infra/symphony/athena"
+alias mAMItraillette="~/dev/quanta/infra/symphony/mAMItraillette"
+
+function ssm() {
+  aws ssm get-parameters-by-path --recursive --with-decryption --path $1 \
+    | jq -r '.Parameters[] | "\(.Name) = \(.Value)"'
+}
+
+function ec2exec() {
+  ids=$1
+  shift
+  cmd="'$*'"
+  cmdid=$(aws ssm send-command --instance-ids "$ids" --document-name "AWS-RunShellScript"  --query "Command.CommandId" --output text --parameters commands=\[$cmd])
+  aws ssm list-command-invocations --command-id "$cmdid" --details --query "CommandInvocations[*].CommandPlugins[*].Output[]" --output text
+}
+
+function ec2ssh() {
+  aws ssm start-session --target $1
+}
+
+#function athena() {
+#  local query="$*"
+#  echo "Running $query"
+#  local bucket="quanta-athena-query-results/$USER"
+#  query_id=`aws athena start-query-execution --result-configuration "OutputLocation=s3://$bucket" --query-string '$query' | jq -r .QueryExecutionId`
+#  echo "ATHENA QUERY $query_id"
+#  aws athena get-query-execution --query-execution-id $query_id | jq .
+#}
+
+
+# Rails stuff
+alias spring='~/dev/quanta/qm3k/bin/spring'
+alias be='bundle exec'
+alias berc='bundle exec rails c'
+alias berk='bundle exec rake'
+alias bespec='bundle exec rspec'
+alias bergm='bundle exec rails g migration'
+
+function qlog() {
+  if [ -d ./log ]; then
+    tail -f ./log/$1.log
+  else
+    tail -f ~/dev/quanta/qm3k/log/$1.log
+  fi
+}
+
+function rebe() {
+  if [ -z "$1" ] || [ -z "$2" ]; then
+     echo "Usage: rebe <rails_env> <cmd...>"
+     return 1
+  fi
+  _rails_env=$1
+  shift
+  RAILS_ENV=$_rails_env bundle exec $@
 }
 
 # Load custom zshrc
 if [ -f ~/.myzshrc ]; then
     source ~/.myzshrc
 fi
+
+# NVM
+if [ -f ~/.nvm/nvm.sh ]; then
+  source ~/.nvm/nvm.sh
+fi
+
+# Rbenv
+eval "$(rbenv init -)"
+
+# Rust
+if [ -d ~/.cargo/bin ]; then
+  export PATH=~/.cargo/bin:${PATH}
+fi
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/local/bin/mc mc
+setopt rm_star_silent
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
