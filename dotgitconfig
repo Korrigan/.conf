@@ -1,17 +1,32 @@
 [color]
-	diff	= auto
-	branch	= auto
-	status	= auto
+  diff  = auto
+  branch  = auto
+  status  = auto
 
 [user]
-	name	= Matthieu Rosinski
-	email	= korrigan@staff.42.fr
+  name  = Matthieu Rosinski
+  email  = korrigan@slash16.org
 
 [alias]
-	ci	= commit -m
-	st 	= status
-	co	= checkout
-	br	= branch
+  ci  = commit -m
+  st   = status
+  co  = checkout
+  br  = branch
+  find-merge = "!sh -c 'commit=$0 && branch=${1:-HEAD} && (git rev-list $commit..$branch --ancestry-path | cat -n; git rev-list $commit..$branch --first-parent | cat -n) | sort -k2 -s | uniq -f1 -d | sort -n | tail -1 | cut -f2'"
+  show-merge = "!sh -c 'merge=$(git find-merge $0 $1) && [ -n \"$merge\" ] && git show $merge'"
+  poule = pull
+
+
 
 [push]
-	default = current
+  default = current
+
+[core]
+  mergeoptions = --no-edit
+  excludesfile = ~/.gitignore
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  required = true
+  process = git-lfs filter-process
