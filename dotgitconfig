@@ -5,16 +5,18 @@
 
 [user]
   name  = Matthieu Rosinski
-  email  = korrigan@slash16.org
+  email  = kforkendetta@gmail.com
 
 [alias]
   ci  = commit -m
+  cne = commit --no-edit
   st   = status
   co  = checkout
   br  = branch
   find-merge = "!sh -c 'commit=$0 && branch=${1:-HEAD} && (git rev-list $commit..$branch --ancestry-path | cat -n; git rev-list $commit..$branch --first-parent | cat -n) | sort -k2 -s | uniq -f1 -d | sort -n | tail -1 | cut -f2'"
   show-merge = "!sh -c 'merge=$(git find-merge $0 $1) && [ -n \"$merge\" ] && git show $merge'"
   poule = pull
+  wip = for-each-ref --sort='authordate:iso8601' --format=' %(color:green)%(authordate:relative)%09%(color:white)%(refname:short)' refs/heads
 
 
 
@@ -30,3 +32,5 @@
   smudge = git-lfs smudge -- %f
   required = true
   process = git-lfs filter-process
+[pull]
+	rebase = false

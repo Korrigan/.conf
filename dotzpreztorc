@@ -1,0 +1,45 @@
+# Init - from zlogin runcom
+
+# Execute code that does not affect the current session in the background.
+{
+  # Compile the completion dump to increase startup speed.
+  zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+  if [[ -s "$zcompdump" && (! -s "${zcompdump}.zwc" || "$zcompdump" -nt "${zcompdump}.zwc") ]]; then
+    zcompile "$zcompdump"
+  fi
+} &!
+
+
+# Color output (auto set to 'no' on dumb terminals).
+zstyle ':prezto:*:*' color 'yes'
+
+# Set the Prezto modules to load (browse modules).
+# The order matters.
+zstyle ':prezto:load' pmodule \
+  'environment' \
+  'terminal' \
+  'editor' \
+  'history' \
+  'spectrum' \
+  'utility' \
+  'completion' \
+  'git' \
+  'prompt'
+
+#  'directory' \ TODO! maybe add some later
+
+# Integrate with iTerm2.
+zstyle ':prezto:module:tmux:iterm' integrate 'yes'
+
+# Set the default session name:
+zstyle ':prezto:module:tmux:session' name "${USER}@${HOSTNAME}"
+
+
+# Disable safe-mode (interactive) by default on ln, cp, etc...
+zstyle ':prezto:module:utility' safe-ops 'no'.
+
+# Add these keys to ssh-agent
+zstyle ':prezto:module:ssh:load' identities 'id_rsa' 'id_rsa.bak'
+
+# Prompt theme
+zstyle ':prezto:module:prompt' theme 'korrigan'
